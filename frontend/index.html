@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .appointments {
+            margin-top: 20px;
+        }
+
+        .appointment {
+            background: #e9ecef;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .appointment span {
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #b02a37;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Appointment Scheduler</h1>
+        <form id="appointment-form">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" name="phone" required>
+
+            <label for="doctor">Doctor</label>
+            <select id="doctor" name="doctor" required>
+                <option value="Dr. Smith">Dr. Smith</option>
+                <option value="Dr. Johnson">Dr. Johnson</option>
+                <option value="Dr. Brown">Dr. Brown</option>
+            </select>
+
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="time">Time</label>
+            <input type="time" id="time" name="time" required>
+
+            <button type="submit">Schedule Appointment</button>
+        </form>
+
+        <div class="appointments">
+            <h2>Scheduled Appointments</h2>
+            <div id="appointment-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('appointment-form');
+        const appointmentList = document.getElementById('appointment-list');
+
+        // Fetch Appointments
+        async function fetchAppointments() {
+            const res = await fetch('http://localhost:5000/api/appointments');
+            const appointments = await res.json();
+
+            appointmentList.innerHTML = '';
+            appointments.forEach(appointment => {
+                const div = document.createElement('div');
+                div.className = 'appointment';
+
+                div.innerHTML = `
+                    <span><strong>${appointment.name}</strong> - ${appointment.doctor} (${appointment.date} at ${appointment.time})</span>
+                    <button class="delete-btn" onclick="deleteAppointment('${appointment._id}')">Delete</button>
+                `;
+
+                appointmentList.appendChild(div);
+            });
+        }
+
+        // Submit Form
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: form.name.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                doctor: form.doctor.value,
+                date: form.date.value,
+                time: form.time.value,
+            };
+
+            await fetch('http://localhost:5000/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            form.reset();
+            fetchAppointments();
+        });
+
+        // Delete Appointment
+        async function deleteAppointment(id) {
+            await fetch(`http://localhost:5000/api/appointments/${id}`, {
+                method: 'DELETE'
+            });
+            fetchAppointments();
+        }
+
+        // Initial Fetch
+        fetchAppointments();
+    </script>
+</body>
+</html>
