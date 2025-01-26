@@ -131,7 +131,7 @@
 
         // Fetch Appointments
         async function fetchAppointments() {
-            const res = await fetch('http://localhost:5000/api/appointments');
+            const res = await fetch('https://internship-assignments-zaqz.onrender.com/api/appointments');
             const appointments = await res.json();
 
             appointmentList.innerHTML = '';
@@ -161,7 +161,7 @@
                 time: form.time.value,
             };
 
-            await fetch('http://localhost:5000/api/appointments', {
+            await fetch('https://internship-assignments-zaqz.onrender.com/api/appointments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -175,7 +175,7 @@
 
         // Delete Appointment
         async function deleteAppointment(id) {
-            await fetch(`http://localhost:5000/api/appointments/${id}`, {
+            await fetch(`https://internship-assignments-zaqz.onrender.com/api/appointments/${id}`, {
                 method: 'DELETE'
             });
             fetchAppointments();
